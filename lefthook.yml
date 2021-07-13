@@ -1,0 +1,9 @@
+pre-commit:
+  parallel: true
+  commands:
+    ansible-lint:
+      run: ansible-lint playbook.yaml
+    terraform:
+      glob: "*.tf"
+      run: terraform fmt -check
+
