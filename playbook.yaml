@@ -1,0 +1,12 @@
+- hosts: all
+  tasks:
+    - name: update apt
+      become: yes
+      apt:
+        update_cache: yes
+
+    - name: install java runtime
+      become: yes
+      apt:
+        pkg:
+          - openjdk-16-jre
