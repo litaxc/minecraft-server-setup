@@ -74,7 +74,7 @@ resource "aws_instance" "minecraft" {
   key_name                    = var.ssh_private_key
 
   tags = {
-    Name = "Minecraft"
+    Name = "Minecraft-${count.index}"
   }
 
   root_block_device {
