@@ -1,5 +1,23 @@
 - hosts: all
+  vars_prompt:
+    - name: download_url
+      prompt: Enter the download URL of minecraft server jar
+      private: no
+
   tasks:
+    - name: wait for ec2 ready
+      block:
+        - name: wait for hosts to be available
+          wait_for_connection:
+            timeout: 600
+        - name: wait for cloud-init to complete  # noqa 301
+          become: yes
+          command: "grep -q 'finish: modules-final: SUCCESS:' /var/log/cloud-init.log"
+          retries: 30
+          delay: 10
+          register: result
+          until: not result.failed
+
     - name: update apt
       become: yes
       apt:
@@ -10,3 +28,75 @@
       apt:
         pkg:
           - openjdk-16-jre
+
+    - name: download minecraft server jar
+      get_url:
+        url: "{{ download_url }}"
+        dest: server.jar
+
+    - name: turn on swap
+      become: yes
+      block:
+        - name: make swapfile
+          command: dd if=/dev/zero of=swapfile bs=1024 count=4096k
+          args:
+            creates: swapfile
+
+        - name: make swapfile owned by root
+          file:
+            path: swapfile
+            owner: root
+            group: root
+            mode: 0600
+
+        - name: make swap
+          shell: mkswap swapfile && touch swapmade
+          args:
+            creates: swapmade
+
+        - name: turn on swap
+          shell: swapon swapfile && touch swapturnedon
+          args:
+            creates: swapturnedon
+
+    - name: setup eula
+      block:
+        - name: check if eula.txt exists
+          stat:
+            path: eula.txt
+          register: eula
+
+        - name: create eula.txt
+          file:
+            path: eula.txt
+            state: touch
+            mode: 0644
+          when: not eula.stat.exists
+
+        - name: set eula
+          lineinfile:
+            path: eula.txt
+            regexp: "eula=false"
+            line: "eula=true"
+      tags: eula
+
+    - name: run minecraft server
+      block:
+        - name: check if tmux session exists
+          command: tmux has-session -t server
+          ignore_errors: yes
+          register: has
+
+        - name: start tmux session
+          command: tmux new-session -t server
+          when: has.failed
+
+        - name: chekc if minecraft server already running
+          shell: |
+            set -o pipefail
+            ps ux | grep java | grep -v grep
+          ignore_errors: yes
+          register: running
+
+
+
