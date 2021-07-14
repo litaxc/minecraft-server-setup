@@ -18,16 +18,20 @@
           register: result
           until: not result.failed
 
-    - name: update apt
-      become: yes
-      apt:
-        update_cache: yes
+    - name: install packages
+      block:
+        - name: update apt
+          become: yes
+          apt:
+            update_cache: yes
 
-    - name: install java runtime
-      become: yes
-      apt:
-        pkg:
-          - openjdk-16-jre
+        - name: install java runtime
+          become: yes
+          apt:
+            pkg:
+              - unzip
+              - openjdk-16-jre
+      tags: pkg
 
     - name: download minecraft server jar
       get_url:
@@ -58,6 +62,7 @@
           shell: swapon swapfile && touch swapturnedon
           args:
             creates: swapturnedon
+      tags: swap
 
     - name: setup eula
       block:
@@ -80,6 +85,13 @@
             line: "eula=true"
       tags: eula
 
+    - name: use existing world
+      unarchive:
+        src: "{{ world_archive_path }}"
+        dest: .
+      when: world_archive_path is defined
+      tags: world
+
     - name: run minecraft server
       block:
         - name: check if tmux session exists
@@ -88,7 +100,7 @@
           register: has
 
         - name: start tmux session
-          command: tmux new-session -t server
+          command: tmux new-session -d -t server
           when: has.failed
 
         - name: chekc if minecraft server already running
@@ -98,5 +110,8 @@
           ignore_errors: yes
           register: running
 
-
+        - name: run minecraft server
+          command: tmux send-key "java -Xmx1024m -jar server.jar" C-m # <C-m> is return key
+          when: running.failed
+      tags: server
 
