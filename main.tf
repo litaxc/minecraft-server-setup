@@ -66,16 +66,15 @@ resource "aws_security_group" "minecraft" {
 }
 
 resource "aws_instance" "minecraft" {
-  count                       = 1
   ami                         = data.aws_ami.base_image.id
   instance_type               = "t4g.micro"
   vpc_security_group_ids      = [aws_security_group.minecraft.id]
   associate_public_ip_address = true
-  subnet_id                   = one(data.aws_subnet_ids.all.ids)
+  subnet_id                   = tolist(data.aws_subnet_ids.all.ids)[0]
   key_name                    = var.ssh_private_key
 
   tags = {
-    Name = "Minecraft-${count.index}"
+    Name = "Minecraft"
   }
 
   root_block_device {
