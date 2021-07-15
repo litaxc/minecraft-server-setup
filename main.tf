@@ -78,7 +78,7 @@ resource "aws_instance" "minecraft" {
   }
 
   root_block_device {
-    delete_on_termination = true
+    delete_on_termination = false
     volume_type           = "gp2"
     volume_size           = 8
   }

@@ -125,5 +125,30 @@
         special_time: reboot
         job: "MAX_MEM={{ max_memory }} start.sh"
 
-  # TODO setup backup
+    - name: setup backup
+      block:
+        - name: create full backup folder
+          file:
+            path: ~/backup/full
+            state: directory
+            mode: 0755
 
+        - name: create incremental backup folder
+          file:
+            path: ~/backup/incremental
+            state: directory
+            mode: 0755
+
+        - name: copy backup script
+          copy:
+            src: backup.sh
+            dest: backup.sh
+            mode: 0755
+
+        - name: set backup cron job
+          cron:
+            name: "backup world every 4hr"
+            minute: "0"
+            hour: "*/4"
+            job: "backup.sh"
+      tags: backup
