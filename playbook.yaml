@@ -2,6 +2,7 @@
   vars:
     download_url:
     world_archive_path:
+    max_memory: 1024m
 
   tasks:
     - name: check download url is specified
@@ -67,6 +68,12 @@
           shell: swapon swapfile && touch swapturnedon
           args:
             creates: swapturnedon
+
+        - name: make swapon after reboot
+          become: yes
+          lineinfile:
+            path: /etc/fstab
+            line: "/home/ubuntu/swapfile none swap sw 0 0"
       tags: swap
 
     - name: setup eula
@@ -108,7 +115,7 @@
         - name: run start script
           shell: ~/start.sh  # noqa 305
           environment:
-            MAX_MEM: 1024m
+            MAX_MEM: "{{ max_memory }}"
           changed_when: false
       tags: server
 
@@ -116,7 +123,7 @@
       cron:
         name: "start minecraft server on reboot"
         special_time: reboot
-        job: "start.sh"
+        job: "MAX_MEM={{ max_memory }} start.sh"
 
   # TODO setup backup
 
