@@ -1,10 +1,14 @@
 - hosts: all
-  vars_prompt:
-    - name: download_url
-      prompt: Enter the download URL of minecraft server jar
-      private: no
+  vars:
+    download_url:
+    world_archive_path:
 
   tasks:
+    - name: check download url is specified
+      debug:
+        msg: "Minecraft server download URL to use: {{ download_url }}"
+      failed_when: download_url is not defined or download_url is none
+
     - name: wait for ec2 ready
       block:
         - name: wait for hosts to be available
@@ -90,7 +94,7 @@
       unarchive:
         src: "{{ world_archive_path }}"
         dest: .
-      when: world_archive_path is defined
+      when: world_archive_path is defined and world_archive_path is not none
       tags: world
 
     - name: run minecraft server
