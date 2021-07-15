@@ -1,5 +1,4 @@
-#!/usr/bash
-set -e
+#!/usr/bin/bash
 set -o pipefail
 
 # start a detached tmux session if not having one
@@ -12,6 +11,6 @@ fi
 ps ux | grep java | grep -v grep
 if [ $? -ne 0 ]; then
     tmux send-key \
-        "java -Xmx${MAX_MEM} -jar server.jar" \
+        "java -Xmx${MAX_MEM} -jar server.jar nogui" \
         C-m # <C-m> is return key
 fi

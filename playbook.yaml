@@ -36,7 +36,8 @@
     - name: download minecraft server jar
       get_url:
         url: "{{ download_url }}"
-        dest: server.jar
+        dest: ~/server.jar
+      tags: download
 
     - name: turn on swap
       become: yes
@@ -101,7 +102,7 @@
             mode: 0755
 
         - name: run start script
-          command: start.sh
+          shell: ~/start.sh  # noqa 305
           environment:
             MAX_MEM: 1024m
           changed_when: false
