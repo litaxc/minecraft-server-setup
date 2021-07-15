@@ -115,6 +115,11 @@
           environment:
             MAX_MEM: "{{ max_memory }}"
           changed_when: false
+
+        - name: set op user
+          command: tmux send-key "op {{ op_user }}" C-m
+          changed_when: false
+          when: op_user is defined
       tags: server
 
     - name: setup reboot
