@@ -30,7 +30,7 @@
           apt:
             pkg:
               - unzip
-              - openjdk-16-jre
+              - openjdk-16-jre-headless
       tags: pkg
 
     - name: download minecraft server jar

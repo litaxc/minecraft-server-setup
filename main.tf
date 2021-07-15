@@ -71,7 +71,7 @@ resource "aws_instance" "minecraft" {
   instance_type               = "t4g.micro"
   vpc_security_group_ids      = [aws_security_group.minecraft.id]
   associate_public_ip_address = true
-  subnet_id                   = tolist(data.aws_subnet_ids.all.ids)[0]
+  subnet_id                   = one(data.aws_subnet_ids.all.ids)
   key_name                    = var.ssh_private_key
 
   tags = {
@@ -79,7 +79,7 @@ resource "aws_instance" "minecraft" {
   }
 
   root_block_device {
-    delete_on_termination = false
+    delete_on_termination = true
     volume_type           = "gp2"
     volume_size           = 8
   }
