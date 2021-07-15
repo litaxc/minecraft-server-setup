@@ -1,8 +1,6 @@
 - hosts: all
-  vars:
-    download_url:
-    world_archive_path:
-    max_memory: 1024m
+  vars_files:
+    - playbook_vars.yaml
 
   tasks:
     - name: check download url is specified

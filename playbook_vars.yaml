@@ -1,0 +1,15 @@
+# the url for downloading minecraft server
+# you could find it here https://www.minecraft.net/download/server
+download_url:
+
+# if you have existing world, zip it and put the path here
+# leave it blank if you don't need to use existing world
+world_archive_path:
+
+# the maximun memory you gave to the minecraft server
+# don't touch it unless you use a different ec2 instance type
+max_memory: 1024m
+
+# the first op user
+# you probably want to put your name here
+op_user:
