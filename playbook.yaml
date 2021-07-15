@@ -94,24 +94,24 @@
 
     - name: run minecraft server
       block:
-        - name: check if tmux session exists
-          command: tmux has-session -t server
-          ignore_errors: yes
-          register: has
+        - name: copy start script
+          copy:
+            src: start.sh
+            dest: start.sh
+            mode: 0755
 
-        - name: start tmux session
-          command: tmux new-session -d -t server
-          when: has.failed
-
-        - name: chekc if minecraft server already running
-          shell: |
-            set -o pipefail
-            ps ux | grep java | grep -v grep
-          ignore_errors: yes
-          register: running
-
-        - name: run minecraft server
-          command: tmux send-key "java -Xmx1024m -jar server.jar" C-m # <C-m> is return key
-          when: running.failed
+        - name: run start script
+          command: start.sh
+          environment:
+            MAX_MEM: 1024m
+          changed_when: false
       tags: server
+
+    - name: setup reboot
+      cron:
+        name: "start minecraft server on reboot"
+        special_time: reboot
+        job: "start.sh"
+
+  # TODO setup backup
 
