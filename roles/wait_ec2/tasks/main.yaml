@@ -1,0 +1,12 @@
+- name: wait for hosts to be available
+  wait_for_connection:
+    timeout: 600
+
+- name: wait for cloud-init to complete  # noqa 301
+  become: yes
+  command: "grep -q 'finish: modules-final: SUCCESS:' /var/log/cloud-init.log"
+  retries: 30
+  delay: 10
+  register: result
+  until: not result.failed
+

@@ -1,0 +1,17 @@
+- name: check if eula.txt exists
+  stat:
+    path: "{{ minecraft_path }}/eula.txt"
+  register: eula
+
+- name: create eula.txt
+  file:
+    path: "{{ minecraft_path }}/eula.txt"
+    state: touch
+    mode: 0644
+  when: not eula.stat.exists
+
+- name: set eula
+  lineinfile:
+    path: "{{ minecraft_path }}/eula.txt"
+    regexp: "eula=false"
+    line: "eula=true"

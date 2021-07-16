@@ -1,0 +1,7 @@
+- name: copy existing world.zip/world.tgz to server
+  unarchive:
+    src: "{{ world_archive_path }}"
+    dest: "{{ minecraft_path }}"
+  when: >
+    world_archive_path is defined and
+    world_archive_path is not none

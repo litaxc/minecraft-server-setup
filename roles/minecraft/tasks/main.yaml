@@ -1,0 +1,21 @@
+- name: create minecraft folder
+  file:
+    path: "{{ minecraft_path }}"
+    state: directory
+    mode: 0755
+
+- name: create swap
+  include: swap.yaml
+  tags: swap
+
+- name: agree eula
+  include: eula.yaml
+  tags: eula
+
+- name: use existing world file
+  include: world.yaml
+  tags: world
+
+- name: start minecraft server
+  include: server.yaml
+  tags: server

@@ -1,0 +1,29 @@
+- name: make swapfile
+  become: yes
+  command: "dd if=/dev/zero of={{ minecraft_path }}/swapfile bs=1024 count=4096k"
+  args:
+    creates: "{{ minecraft_path }}/swapfile"
+
+- name: make swapfile only accessable by root
+  become: yes
+  file:
+    path: "{{ minecraft_path }}/swapfile"
+    mode: 0600
+
+- name: make swap
+  become: yes
+  shell: "mkswap {{ minecraft_path }}/swapfile && touch {{ minecraft_path }}/.swapmade"
+  args:
+    creates: "{{ minecraft_path }}/.swapmade"
+
+- name: turn on swap
+  become: yes
+  shell: "swapon {{ minecraft_path }}/swapfile && touch {{ minecraft_path }}/.swapon"
+  args:
+    creates: "{{ minecraft_path }}/.swapon"
+
+- name: make swapon after reboot
+  become: yes
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ minecraft_path }}/swapfile none swap sw 0 0"

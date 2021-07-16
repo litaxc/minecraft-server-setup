@@ -3,124 +3,20 @@
     - playbook_vars.yaml
 
   tasks:
-    - name: check download url is specified
-      debug:
-        msg: "Minecraft server download URL to use: {{ download_url }}"
-      failed_when: download_url is not defined or download_url is none
-
-    - name: wait for ec2 ready
-      block:
-        - name: wait for hosts to be available
-          wait_for_connection:
-            timeout: 600
-        - name: wait for cloud-init to complete  # noqa 301
-          become: yes
-          command: "grep -q 'finish: modules-final: SUCCESS:' /var/log/cloud-init.log"
-          retries: 30
-          delay: 10
-          register: result
-          until: not result.failed
+    - name: wait until ec2 instance is ready
+      include_role:
+        name: wait_ec2
+      tags: wait_ec2
 
     - name: install packages
-      block:
-        - name: update apt
-          become: yes
-          apt:
-            update_cache: yes
-
-        - name: install java runtime
-          become: yes
-          apt:
-            pkg:
-              - unzip
-              - openjdk-16-jre-headless
+      include_role:
+        name: init
       tags: pkg
 
-    - name: download minecraft server jar
-      get_url:
-        url: "{{ download_url }}"
-        dest: ~/server.jar
-      tags: download
-
-    - name: turn on swap
-      become: yes
-      block:
-        - name: make swapfile
-          command: dd if=/dev/zero of=swapfile bs=1024 count=4096k
-          args:
-            creates: swapfile
-
-        - name: make swapfile owned by root
-          file:
-            path: swapfile
-            owner: root
-            group: root
-            mode: 0600
-
-        - name: make swap
-          shell: mkswap swapfile && touch swapmade
-          args:
-            creates: swapmade
-
-        - name: turn on swap
-          shell: swapon swapfile && touch swapturnedon
-          args:
-            creates: swapturnedon
-
-        - name: make swapon after reboot
-          become: yes
-          lineinfile:
-            path: /etc/fstab
-            line: "/home/ubuntu/swapfile none swap sw 0 0"
-      tags: swap
-
-    - name: setup eula
-      block:
-        - name: check if eula.txt exists
-          stat:
-            path: eula.txt
-          register: eula
-
-        - name: create eula.txt
-          file:
-            path: eula.txt
-            state: touch
-            mode: 0644
-          when: not eula.stat.exists
-
-        - name: set eula
-          lineinfile:
-            path: eula.txt
-            regexp: "eula=false"
-            line: "eula=true"
-      tags: eula
-
-    - name: use existing world
-      unarchive:
-        src: "{{ world_archive_path }}"
-        dest: .
-      when: world_archive_path is defined and world_archive_path is not none
-      tags: world
-
-    - name: run minecraft server
-      block:
-        - name: copy start script
-          copy:
-            src: start.sh
-            dest: start.sh
-            mode: 0755
-
-        - name: run start script
-          shell: ~/start.sh  # noqa 305
-          environment:
-            MAX_MEM: "{{ max_memory }}"
-          changed_when: false
-
-        - name: set op user
-          command: tmux send-key "op {{ op_user }}" C-m
-          changed_when: false
-          when: op_user is defined
-      tags: server
+    - name: start minecraft server
+      include_role:
+        name: minecraft
+      tags: minecraft
 
     - name: setup reboot
       cron:

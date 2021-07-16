@@ -1,0 +1,27 @@
+- name: download minecraft server jar
+  get_url:
+    url: "{{ download_url }}"
+    dest: "{{ minecraft_path }}/server.jar"
+  failed_when: >
+    download_url is not defined or
+    download_url is none or
+    download_url | length == 0
+  tags: download
+
+- name: copy start script
+  copy:
+    src: start.sh
+    dest: "{{ minecraft_path }}/start.sh"
+    mode: 0755
+
+- name: run start script
+  shell: "{{ minecraft_path }}/start.sh"  # noqa 305
+  environment:
+    MAX_MEM: "{{ max_memory }}"
+  changed_when: false
+
+- name: set op user
+  command: tmux send-key "op {{ item }}" C-m
+  changed_when: false
+  when: op_users is defined
+  loop: "{{ op_users }}"
