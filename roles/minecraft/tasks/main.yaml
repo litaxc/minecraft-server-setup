@@ -1,7 +1,10 @@
 - name: create minecraft folder
+  become: yes
   file:
     path: "{{ minecraft_path }}"
     state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: 0755
 
 - name: create swap

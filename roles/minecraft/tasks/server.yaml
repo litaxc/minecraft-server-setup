@@ -27,3 +27,9 @@
     op_users is defined and
     op_users | length > 0
   loop: "{{ op_users }}"
+
+- name: setup reboot
+  cron:
+    name: "start minecraft server on reboot"
+    special_time: reboot
+    job: "MAX_MEM={{ max_memory }} {{ minecraft_path }}/start.sh"

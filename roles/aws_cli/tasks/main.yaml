@@ -1,0 +1,21 @@
+- name: Check if AWS CLI is already installed
+  stat:
+    path: /usr/local/aws-cli/v2/current
+  register: result
+
+- name: Download and install AWS CLI
+  when: not result.stat.exists
+  block:
+    - name: Download AWS CLI
+      unarchive:
+        src: "https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip"
+        dest: /tmp
+        remote_src: yes
+
+    - name: Install AWS CLI
+      command: /tmp/aws/install
+
+- name: Verify AWS CLI Installation
+  command: /usr/local/bin/aws --version
+  changed_when: false
+
