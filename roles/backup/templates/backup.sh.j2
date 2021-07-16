@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
-tar czf world.tgz {{ minecraft_path }}/world
+tar czf /tmp/world.tgz {{ minecraft_path }}/world
 
-aws s3 cp world.tgz s3://{{ s3_bucket }}/{{ backup_path }}/
+aws s3 cp /tmp/world.tgz s3://{{ s3_bucket }}/{{ backup_path }}/

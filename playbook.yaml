@@ -1,21 +1,13 @@
 - hosts: all
-  tasks:
-    - name: wait until ec2 instance is ready
-      include_role:
-        name: wait_ec2
+  roles:
+    - role: wait_ec2
       tags: wait_ec2
 
-    - name: install packages
-      include_role:
-        name: init
-      tags: pkg
+    - role: init
+      tags: init
 
-    - name: start minecraft server
-      include_role:
-        name: minecraft
+    - role: minecraft
       tags: minecraft
 
-    - name: setup backup
-      include_role:
-        name: backup
+    - role: backup
       tags: backup
