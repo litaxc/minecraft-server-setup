@@ -1,6 +1,7 @@
 # the url for downloading minecraft server
 # you could find it here https://www.minecraft.net/download/server
-download_url: https://launcher.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar
+download_url:
+
 # the path to put everything minecraft
 minecraft_path: /etc/minecraft
 

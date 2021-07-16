@@ -23,5 +23,7 @@
 - name: set op user
   command: tmux send-key "op {{ item }}" C-m
   changed_when: false
-  when: op_users is defined
+  when: >
+    op_users is defined and
+    op_users | length > 0
   loop: "{{ op_users }}"
