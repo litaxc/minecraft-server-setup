@@ -13,6 +13,7 @@
         remote_src: yes
 
     - name: Install AWS CLI
+      become: yes
       command: /tmp/aws/install
 
 - name: Verify AWS CLI Installation
@@ -26,6 +27,12 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0700
+
+- name: copy config
+  copy:
+    src: config
+    dest: "{{ ansible_env.HOME }}/.aws"
+    mode: 0600
 
 - name: copy credentials
   copy:

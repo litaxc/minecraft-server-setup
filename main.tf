@@ -49,8 +49,11 @@ resource "aws_iam_user_policy" "minecraft" {
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::${data.aws_s3_bucket.backup.arn}/${var.backup_path}/*"
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "${data.aws_s3_bucket.backup.arn}/${var.backup_path}/*"
     }
   ]
 }
@@ -108,7 +111,7 @@ resource "aws_instance" "minecraft" {
   }
 
   root_block_device {
-    delete_on_termination = false
+    delete_on_termination = true
     volume_type           = "gp2"
     volume_size           = 8
   }

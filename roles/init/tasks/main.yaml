@@ -7,5 +7,4 @@
   become: yes
   apt:
     pkg:
-      - unzip
       - openjdk-16-jre-headless

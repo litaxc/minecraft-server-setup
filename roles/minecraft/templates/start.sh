@@ -8,7 +8,7 @@ fi
 # start a detached tmux session if not having one
 tmux has-session -t server
 if [ $? -ne 0 ]; then
-    tmux new-session -d -t server
+    tmux new-session -d -c {{ minecraft_path }} -t server
 fi
 
 # start the server in tmux session if server is not running

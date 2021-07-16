@@ -9,7 +9,7 @@
   tags: download
 
 - name: copy start script
-  copy:
+  template:
     src: start.sh
     dest: "{{ minecraft_path }}/start.sh"
     mode: 0755
