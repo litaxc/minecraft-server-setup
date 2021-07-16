@@ -67,7 +67,7 @@ resource "aws_security_group" "minecraft" {
 
 resource "aws_instance" "minecraft" {
   ami                         = data.aws_ami.base_image.id
-  instance_type               = "t4g.micro"
+  instance_type               = "t4g.small"
   vpc_security_group_ids      = [aws_security_group.minecraft.id]
   associate_public_ip_address = true
   subnet_id                   = tolist(data.aws_subnet_ids.all.ids)[0]
