@@ -31,6 +31,36 @@ data "aws_ami" "base_image" {
   name_regex  = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-*"
 }
 
+data "aws_s3_bucket" "backup" {
+  bucket = var.s3_bucket
+}
+
+resource "aws_iam_user" "minecraft" {
+  name = "minecraft"
+}
+
+resource "aws_iam_user_policy" "minecraft" {
+  name = "minecraft"
+  user = aws_iam_user.minecraft.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${data.aws_s3_bucket.backup.arn}/${var.backup_path}/*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_access_key" "minecraft" {
+  user = aws_iam_user.minecraft.name
+}
+
 resource "aws_security_group" "minecraft" {
   name        = "Minecraft"
   description = "Security group for Minecraft server"
