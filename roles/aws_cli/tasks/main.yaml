@@ -19,3 +19,16 @@
   command: /usr/local/bin/aws --version
   changed_when: false
 
+- name: Create .aws directory
+  file:
+    path: "{{ ansible_env.HOME }}/.aws"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0700
+
+- name: copy credentials
+  copy:
+    src: credentials
+    dest: "{{ ansible_env.HOME }}/.aws"
+    mode: 0600

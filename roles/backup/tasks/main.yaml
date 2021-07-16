@@ -1,19 +1,12 @@
-- name: create full backup folder
-  file:
-    path: ~/backup/full
-    state: directory
-    mode: 0755
-
-- name: create incremental backup folder
-  file:
-    path: ~/backup/incremental
-    state: directory
-    mode: 0755
+- name: install aws cli
+  include_role:
+    name: aws_cli
+  tags: aws_cli
 
 - name: copy backup script
   copy:
     src: backup.sh
-    dest: backup.sh
+    dest: "{{ minecraft_path }}/backup.sh"
     mode: 0755
 
 - name: set backup cron job
@@ -21,4 +14,4 @@
     name: "backup world every 4hr"
     minute: "0"
     hour: "*/4"
-    job: "backup.sh"
+    job: "{{ minecraft_path }}/backup.sh"
