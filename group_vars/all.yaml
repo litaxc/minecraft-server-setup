@@ -15,3 +15,8 @@ max_memory: 2048m
 # a list of op users
 # you probably want to put your name here
 op_users: []
+
+# the s3 bucket for backup
+s3_bucket:
+# the path under s3 bucket for backup
+backup_path:

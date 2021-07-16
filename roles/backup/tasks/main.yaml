@@ -4,8 +4,8 @@
   tags: aws_cli
 
 - name: copy backup script
-  copy:
-    src: backup.sh
+  template:
+    src: backup.sh.j2
     dest: "{{ minecraft_path }}/backup.sh"
     mode: 0755
 
