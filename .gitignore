@@ -1,5 +1,3 @@
 .terraform*
 *.tfstate*
 inventory.yaml
-config
-credentials

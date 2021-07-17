@@ -7,20 +7,3 @@ resource "local_file" "inventory_yaml" {
   )
   filename = "inventory.yaml"
 }
-
-resource "local_file" "aws_cli_config" {
-  content  = <<EOF
-[default]
-region = ${var.aws_region}
-EOF
-  filename = "config"
-}
-
-resource "local_file" "aws_cli_credentials" {
-  content  = <<EOF
-[default]
-aws_access_key_id = ${aws_iam_access_key.minecraft.id}
-aws_secret_access_key = ${aws_iam_access_key.minecraft.secret}
-EOF
-  filename = "credentials"
-}

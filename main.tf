@@ -8,7 +8,11 @@ terraform {
       version = "~> 2.0.0"
     }
   }
-  backend "local" {}
+  backend "s3" {
+    bucket = var.s3_bucket
+    region = var.aws_region
+    key    = "${var.backup_path}/terraform.tfstate"
+  }
 }
 
 provider "aws" {
@@ -35,13 +39,29 @@ data "aws_s3_bucket" "backup" {
   bucket = var.s3_bucket
 }
 
-resource "aws_iam_user" "minecraft" {
+resource "aws_iam_role" "minecraft" {
   name = "minecraft"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
-resource "aws_iam_user_policy" "minecraft" {
+resource "aws_iam_role_policy" "minecraft" {
   name = "minecraft"
-  user = aws_iam_user.minecraft.name
+  role = aws_iam_role.minecraft.name
 
   policy = <<EOF
 {
@@ -60,8 +80,9 @@ resource "aws_iam_user_policy" "minecraft" {
 EOF
 }
 
-resource "aws_iam_access_key" "minecraft" {
-  user = aws_iam_user.minecraft.name
+resource "aws_iam_instance_profile" "minecraft" {
+  name = "minecraft"
+  role = aws_iam_role.minecraft.name
 }
 
 resource "aws_security_group" "minecraft" {
@@ -105,6 +126,8 @@ resource "aws_instance" "minecraft" {
   associate_public_ip_address = true
   subnet_id                   = tolist(data.aws_subnet_ids.all.ids)[0]
   key_name                    = var.ssh_private_key
+
+  iam_instance_profile = aws_iam_instance_profile.minecraft.name
 
   tags = {
     Name = "Minecraft"
